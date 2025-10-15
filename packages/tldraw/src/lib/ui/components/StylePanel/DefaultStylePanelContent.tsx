@@ -48,6 +48,9 @@ export function DefaultStylePanelContent() {
 				<StylePanelSizePicker />
 			</StylePanelSection>
 			<StylePanelSection>
+				<StylePanelSecondColorPicker />
+			</StylePanelSection>
+			<StylePanelSection>
 				<StylePanelFontPicker />
 				<StylePanelTextAlignPicker />
 				<StylePanelLabelAlignPicker />
@@ -86,6 +89,43 @@ export function StylePanelColorPicker() {
 			style={DefaultColorStyle}
 			items={STYLES.color}
 			value={color}
+		/>
+	)
+}
+
+/** @public @react */
+export function StylePanelSecondColorPicker() {
+	const editor = useEditor()
+	const { styles } = useStylePanelContext()
+	const msg = useTranslation()
+	const color = styles.get(DefaultColorStyle)
+	
+	// Check if any selected shapes are text shapes
+	const hasTextSelection = useValue(
+		'hasTextSelection',
+		() => {
+			const selectedShapes = editor.getSelectedShapes()
+			return selectedShapes.some(shape => shape.type === 'text')
+		},
+		[editor]
+	)
+	
+	// Independent state for second color picker
+	const [secondColor, setSecondColor] = React.useState('black')
+	
+	// Only show when text elements are selected
+	if (color === undefined || !hasTextSelection) return null
+
+	return (
+		<StylePanelButtonPicker
+			title={msg('style-panel.color') + ' (Second)'}
+			uiType="color"
+			style={DefaultColorStyle}
+			items={STYLES.color}
+			value={{ type: 'shared', value: secondColor }}
+			onValueChange={() => {
+				// Non-functional as requested - doesn't affect drawing
+			}}
 		/>
 	)
 }
